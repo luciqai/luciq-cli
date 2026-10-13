@@ -247,7 +247,7 @@ Narrow with `--filters` (`date_ms`, `app_version`).
 ### Issues
 
 `luciq issues list` — Issues across crashes, APM, AI, and bugs, ranked by Apdex
-impact. Flags: `--limit`, `--sort-by` (apdex_impact/occurrences_counter),
+impact. Flags: `--limit`, `--sort-by` (apdex_impact/issue_count),
 `--sort-direction`, `--top-issues` (curated shortlist), `--pagination`
 (per-source cursor tokens JSON).
 
