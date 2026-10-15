@@ -414,7 +414,7 @@ module Luciq
         teams            ["<team-id>", ...]
         platform         ["IOS","ANDROID","DART","JAVASCRIPT"]
         apm_types        ["networks","traces","launches","screen_loadings","frame_drops"]
-        crashes_types    ["CRASH","ANR","OOM","NON_FATAL"]
+        crashes_types    ["CRASH","ANR","OOM","NON_FATAL","APP_HANG","FORCE_RESTART"]
         ai_issues_types  ["visual_issue","broken_functionality"]
         bugs_types       ["<type>", ...]
         apdex_severity   ["high","medium","low","no_impact"]
