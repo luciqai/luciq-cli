@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Breaking:** `luciq crashes hangs` is removed. Use `luciq crashes list --type APP_HANG` to list app hangs.
 
+### Changed
+
+- **Breaking:** `luciq issues list --sort-by` takes `issue_count` instead of `occurrences_counter`. Update any command or script that passes `--sort-by occurrences_counter`.
+
 ## [0.3.0] - 2026-08-04
 
 ### Changed
