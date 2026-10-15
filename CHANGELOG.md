@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `FORCE_RESTART` value for `luciq crashes list --type`, to list force restarts. The server lists them only when this value is given, and only on plans that include force restarts.
 
+### Changed
+
+- **Breaking:** `luciq crashes hangs` is removed. Use `luciq crashes list --type APP_HANG` to list app hangs.
+
 ## [0.3.0] - 2026-08-04
 
 ### Changed

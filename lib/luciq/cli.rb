@@ -41,7 +41,7 @@ module Luciq
     desc 'upload SUBCOMMAND', 'Upload symbol files to Luciq'
     subcommand 'upload', UploadCLI
 
-    desc 'crashes SUBCOMMAND', 'Query crashes (list, show, patterns, diagnostics, hangs, occurrence-tokens, occurrence)'
+    desc 'crashes SUBCOMMAND', 'Query crashes (list, show, patterns, diagnostics, occurrence-tokens, occurrence)'
     subcommand 'crashes', CrashesCLI
 
     desc 'bugs SUBCOMMAND', 'Query bugs (list, show, update)'

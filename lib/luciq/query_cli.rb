@@ -47,7 +47,7 @@ module Luciq
         os_versions    ["17.4", ...]
         platform       ["IOS","ANDROID","DART","JAVASCRIPT"]
         current_views  ["<screen-name>", ...]
-        type           ["CRASH","ANR","OOM","NON_FATAL","FORCE_RESTART"]
+        type           ["CRASH","ANR","OOM","NON_FATAL","APP_HANG","FORCE_RESTART"]
                        (force restarts are listed only when FORCE_RESTART is given)
         subtype        ["CRITICAL","ERROR","WARNING","INFO"]  (needs NON_FATAL in type)
         feature_flags  ["<flag>" or "<flag> -> <variant>", ...]
@@ -59,7 +59,7 @@ module Luciq
     QueryOptions.sort(self, sort_by_enum: SORT_FIELDS)
     option :status, type: :array, enum: %w[open closed in_progress], desc: 'Filter by status'
     option :platform, type: :array, enum: %w[IOS ANDROID DART JAVASCRIPT], desc: 'Filter by platform'
-    option :type, type: :array, enum: %w[CRASH ANR OOM NON_FATAL FORCE_RESTART], desc: 'Filter by crash type'
+    option :type, type: :array, enum: %w[CRASH ANR OOM NON_FATAL APP_HANG FORCE_RESTART], desc: 'Filter by crash type'
     option :app_version, type: :array, desc: 'Filter by app version(s)'
     QueryOptions.raw_filters(self)
     def list
@@ -100,31 +100,6 @@ module Luciq
     option :number, type: :numeric, required: true, desc: 'Crash number'
     def diagnostics
       Commands::Query.new(options).crash_diagnostics(options[:number])
-    end
-
-    desc 'hangs', 'List app hangs for an application'
-    long_desc(<<~DESC, wrap: false)
-      List app hangs for an application.
-
-      Typed flags: --status, --platform, --app-version. Other filters via --filters:
-        date_ms        {"gte": <ms>, "lte": <ms>}
-        status_id      [1,2,3]
-        teams          ["<team-id>", ...]
-        app_versions   ["1.2.3", ...]
-        devices        ["iPhone15,2", ...]
-        os_versions    ["17.4", ...]
-        platform       ["IOS","ANDROID","DART","JAVASCRIPT"]
-        current_views  ["<screen-name>", ...]
-    DESC
-    QueryOptions.app(self)
-    QueryOptions.page(self)
-    QueryOptions.sort(self, sort_by_enum: SORT_FIELDS)
-    option :status, type: :array, enum: %w[open closed in_progress], desc: 'Filter by status'
-    option :platform, type: :array, enum: %w[IOS ANDROID DART JAVASCRIPT], desc: 'Filter by platform'
-    option :app_version, type: :array, desc: 'Filter by app version(s)'
-    QueryOptions.raw_filters(self)
-    def hangs
-      Commands::Query.new(options).app_hangs
     end
 
     desc 'occurrence-tokens', 'List occurrence tokens for a crash'

@@ -74,7 +74,7 @@ luciq upload android-mapping mapping.txt \
 | `luciq info` | Show CLI configuration |
 | `luciq version` | Show CLI version |
 | `luciq upload` | Upload symbol files (see below) |
-| `luciq crashes` | Query crashes, hangs, and occurrences |
+| `luciq crashes` | Query crashes (including app hangs) and occurrences |
 | `luciq bugs` | Query and update bugs |
 | `luciq apm` | Query APM metrics and manage funnels |
 | `luciq reviews` | Query app store reviews |
@@ -165,11 +165,10 @@ keys each command accepts.
 
 | Subcommand | Description |
 |------------|-------------|
-| `list` | List crashes. Flags: `--status` (open/closed/in_progress), `--platform` (IOS/ANDROID/DART/JAVASCRIPT), `--type` (CRASH/ANR/OOM/NON_FATAL/FORCE_RESTART; force restarts are listed only with FORCE_RESTART), `--app-version` |
+| `list` | List crashes. Flags: `--status` (open/closed/in_progress), `--platform` (IOS/ANDROID/DART/JAVASCRIPT), `--type` (CRASH/ANR/OOM/NON_FATAL/APP_HANG/FORCE_RESTART; force restarts are listed only with FORCE_RESTART), `--app-version` |
 | `show --number N` | Details for one crash |
 | `patterns --number N` | Grouped patterns. Flags: `--pattern-key`, `--sort-by`, `--direction` |
 | `diagnostics --number N` | Diagnostics for one crash |
-| `hangs` | List app hangs (same filters as `list`) |
 | `occurrence-tokens --number N` | Occurrence cursor tokens. Flags: `--current-token`, `--direction` (first/last) |
 | `occurrence --number N --ulid U` | Details for a single occurrence |
 

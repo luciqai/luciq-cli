@@ -46,15 +46,6 @@ module Luciq
         f
       end
 
-      def hang_filters
-        f = raw_filters
-        ids = map_ids(CRASH_STATUS_IDS, @options[:status])
-        f['status_id'] = ids unless ids.empty?
-        f['platform'] = Array(@options[:platform]) if @options[:platform]
-        f['app_versions'] = Array(@options[:app_version]) if @options[:app_version]
-        f
-      end
-
       def bug_filters
         f = raw_filters
         ids = map_ids(BUG_STATUS_IDS, @options[:status])

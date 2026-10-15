@@ -39,10 +39,6 @@ module Luciq
         execute('crash_diagnostics') { base_args.merge(number: number) }
       end
 
-      def app_hangs
-        execute('list_app_hangs') { base_args.merge(page_args, sort_args, filters_arg(hang_filters)) }
-      end
-
       def occurrence_tokens(number)
         cursor = { current_token: @options[:current_token], direction: @options[:direction] }.compact
         execute('list_occurrences_tokens') do

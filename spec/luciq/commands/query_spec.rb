@@ -445,19 +445,6 @@ RSpec.describe Luciq::Commands::Query do
     end
   end
 
-  describe '#app_hangs' do
-    it 'maps status ids and typed filters into list_app_hangs' do
-      options = { slug: 'a', mode: 'production', status: ['open'], platform: ['ANDROID'], app_version: ['2.0'] }
-
-      expect(client).to receive(:invoke_tool).with(
-        'list_app_hangs',
-        hash_including(filters: { 'status_id' => [1], 'platform' => ['ANDROID'], 'app_versions' => ['2.0'] })
-      ).and_return({})
-
-      expect { described_class.new(options).app_hangs }.to output.to_stdout
-    end
-  end
-
   describe '#occurrence_tokens' do
     it 'forwards the cursor token and direction' do
       options = { slug: 'a', mode: 'production', current_token: 't', direction: 'last' }
