@@ -11,6 +11,13 @@ module Luciq
       CRASH_STATUS_IDS = { 'open' => 1, 'closed' => 2, 'in_progress' => 3 }.freeze
       BUG_STATUS_IDS   = { 'new' => 1, 'closed' => 2, 'in_progress' => 3 }.freeze
       BUG_PRIORITY_IDS = { 'na' => -1, 'trivial' => 1, 'minor' => 2, 'major' => 3, 'blocker' => 4 }.freeze
+      # Flag pairs `bugs update` refuses together.
+      BUG_UPDATE_FLAG_CONFLICTS = [
+        [:assignee, :unassign, '--assignee cannot be combined with --unassign'],
+        [:team, :clear_team, '--team cannot be combined with --clear-team'],
+        [:clear_tags, :tag_action,
+         '--clear-tags cannot be combined with --tag-action (--clear-tags already replaces with an empty set)']
+      ].freeze
 
       private
 
@@ -89,23 +96,24 @@ module Luciq
       # Top-level (non-filter) changes for `bugs update`.
       def bug_update_changes
         action = bug_duplicate_action
-        if action && (@options[:status] || @options[:priority])
-          raise 'Duplicate marking cannot be combined with --status/--priority'
-        end
-        if @options[:clear_tags] && @options[:tag_action]
-          raise '--clear-tags cannot be combined with --tag-action (--clear-tags already replaces with an empty set)'
-        end
+        reject_conflicting_bug_update_flags!(action)
 
         changes = {
           status_id: map_one(BUG_STATUS_IDS, @options[:status]),
-          priority_id: map_one(BUG_PRIORITY_IDS, @options[:priority]),
+          priority_id: bug_priority_id(@options[:priority]),
+          assignee: @options[:assignee],
+          team: (@options[:clear_team] ? '' : @options[:team]),
           tags: (@options[:clear_tags] ? [] : @options[:tags]),
+          comment: @options[:comment],
           action: action,
           original_bug_number: @options[:duplicate_of]
         }.compact
+        # A null assignee unassigns, so it goes in after compact.
+        changes[:assignee] = nil if @options[:unassign]
 
         if changes.empty?
-          raise 'Provide at least one change (--status/--priority/--tags/--clear-tags/--duplicate-of/--action)'
+          raise 'Provide at least one change (--status/--priority/--assignee/--unassign/--team/--clear-team/' \
+                '--tags/--clear-tags/--comment/--duplicate-of/--action)'
         end
 
         # tag_action only modifies how --tags is applied; on its own it is not a change
@@ -122,6 +130,27 @@ module Luciq
         return @options[:action] if @options[:action]
 
         'mark_as_duplicate' if @options[:duplicate_of]
+      end
+
+      def reject_conflicting_bug_update_flags!(action)
+        # A duplicate takes its status, priority and assignee from its master.
+        if action && %i[status priority assignee unassign].any? { |flag| @options[flag] }
+          raise 'Duplicate marking cannot be combined with --status/--priority/--assignee/--unassign'
+        end
+
+        BUG_UPDATE_FLAG_CONFLICTS.each do |first, second, message|
+          raise message if @options[first] && @options[second]
+        end
+      end
+
+      # A name for a system priority, or the number of one the application added.
+      def bug_priority_id(value)
+        return if value.nil?
+        return BUG_PRIORITY_IDS[value] if BUG_PRIORITY_IDS.key?(value)
+
+        Integer(value, 10)
+      rescue ArgumentError
+        raise "Unknown --priority #{value}. Use na, trivial, minor, major, blocker, or a custom priority number"
       end
 
       def filters_arg(filters)
