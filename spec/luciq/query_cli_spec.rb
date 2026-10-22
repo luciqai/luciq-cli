@@ -22,3 +22,24 @@ RSpec.describe Luciq::CrashesCLI do
     end
   end
 end
+
+RSpec.describe Luciq::BugsCLI do
+  describe 'update' do
+    let(:client) { instance_double(Luciq::API::Client) }
+
+    before do
+      ENV['LUCIQ_AUTH_TOKEN'] = 'token-123'
+      allow(Luciq::API::Client).to receive(:new).and_return(client)
+    end
+
+    # Thor would otherwise pass the option's own name, and post "comment" as the comment.
+    %w[assignee team comment].each do |flag|
+      it "reads a bare --#{flag} as blank and sends nothing" do
+        expect(client).not_to receive(:invoke_tool)
+
+        expect { Luciq::CLI.start(%W[bugs update --slug a --mode production --number 7 --#{flag} --status closed]) }
+          .to output(/--#{flag} needs/).to_stdout.and raise_error(SystemExit)
+      end
+    end
+  end
+end

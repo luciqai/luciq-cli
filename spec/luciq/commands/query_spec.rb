@@ -192,6 +192,26 @@ RSpec.describe Luciq::Commands::Query do
       expect { described_class.new(options).bug_update(7) }
         .to output(/--team cannot be combined with --clear-team/).to_stdout.and raise_error(SystemExit)
     end
+
+    # The server reads a blank assignee or team as "unassign", so an empty shell
+    # variable must not clear the field.
+    it 'rejects a blank --assignee and points to --unassign' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', assignee: '' }).bug_update(7) }
+        .to output(/--assignee needs a teammate's email\. Use --unassign/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects a blank --team and points to --clear-team' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', team: '  ' }).bug_update(7) }
+        .to output(/--team needs a team name or id\. Use --clear-team/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects a blank --comment' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', status: 'closed', comment: '' }).bug_update(7) }
+        .to output(/--comment needs text/).to_stdout.and raise_error(SystemExit)
+    end
   end
 
   describe '#apm_groups' do

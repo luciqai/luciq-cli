@@ -203,7 +203,9 @@ Duplicate marking (`--duplicate-of` / `--action`) can't be combined with
 its master. `--priority` also takes the number of a custom priority of the application.
 `--assignee` takes a teammate's email and `--unassign` removes the assignee; `--team`
 takes a team name or id and `--clear-team` removes the team. `--comment` adds a
-plain-text comment to the activity feed (max 16000 characters). Tags: `--tags` appends to the existing
+plain-text comment to the activity feed (max 16000 characters). A blank `--assignee`,
+`--team`, or `--comment` is refused, so an empty variable never clears a field.
+Tags: `--tags` appends to the existing
 tags by default; `--tag-action replace` sets `--tags` as the full list (removing others),
 `--tag-action remove` deletes `--tags` and keeps the rest; `--clear-tags` removes all.
 

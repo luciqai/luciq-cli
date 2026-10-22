@@ -183,6 +183,7 @@ module Luciq
 
       Assignment: --assignee takes a teammate's email; --unassign removes the
       assignee. --team takes a team name or id; --clear-team removes the team.
+      A blank --assignee, --team, or --comment is refused.
 
       Tags: --tags appends to the existing tags by default. Use --tag-action to change
       that: replace sets --tags as the full list (removing others); remove deletes --tags
@@ -199,15 +200,20 @@ module Luciq
     option :status, type: :string, enum: %w[new closed in_progress], desc: 'New status'
     option :priority, type: :string,
                       desc: 'New priority: na, trivial, minor, major, blocker, or a custom priority number'
-    option :assignee, type: :string, desc: "Teammate's email to assign (cannot be combined with --unassign)"
+    # lazy_default: a flag given without a value reads as blank and is refused.
+    # Without it, Thor passes the option's own name ("comment") as the value.
+    option :assignee, type: :string, lazy_default: '',
+                      desc: "Teammate's email to assign (cannot be combined with --unassign)"
     option :unassign, type: :boolean, desc: 'Remove the assignee'
-    option :team, type: :string, desc: 'Team name or id to assign (cannot be combined with --clear-team)'
+    option :team, type: :string, lazy_default: '',
+                  desc: 'Team name or id to assign (cannot be combined with --clear-team)'
     option :clear_team, type: :boolean, desc: 'Remove the team'
     option :tags, type: :array, desc: 'Tags to apply (see --tag-action; appends to existing tags by default)'
     option :tag_action, type: :string, enum: %w[replace append remove],
                         desc: 'How --tags is applied: append (default, keep existing), replace, remove'
     option :clear_tags, type: :boolean, desc: 'Remove all tags (cannot be combined with --tag-action)'
-    option :comment, type: :string, desc: 'Comment to add to the activity feed (max 16000 characters)'
+    option :comment, type: :string, lazy_default: '',
+                     desc: 'Comment to add to the activity feed (max 16000 characters)'
     option :duplicate_of, type: :numeric, desc: 'Master bug number (marks this a duplicate)'
     option :action, type: :string, enum: %w[mark_as_duplicate unmark_as_duplicate],
                     desc: 'Duplicate action (defaults to mark_as_duplicate with --duplicate-of)'
