@@ -138,6 +138,80 @@ RSpec.describe Luciq::Commands::Query do
       expect { described_class.new({ slug: 'a', mode: 'production', tag_action: 'remove' }).bug_update(7) }
         .to output(/at least one change/).to_stdout.and raise_error(SystemExit)
     end
+
+    it 'forwards the assignee, team, and comment' do
+      options = { slug: 'a', mode: 'production', assignee: 'dev@example.com', team: 'Core',
+                  comment: 'Fixed in 6.1.3' }
+
+      expect(client).to receive(:invoke_tool)
+        .with('update_bug', { slug: 'a', mode: 'production', number: 7, assignee: 'dev@example.com',
+                              team: 'Core', comment: 'Fixed in 6.1.3' })
+        .and_return({})
+
+      expect { described_class.new(options).bug_update(7) }.to output.to_stdout
+    end
+
+    it 'sends a null assignee for --unassign and an empty team for --clear-team' do
+      options = { slug: 'a', mode: 'production', unassign: true, clear_team: true }
+
+      expect(client).to receive(:invoke_tool)
+        .with('update_bug', { slug: 'a', mode: 'production', number: 7, assignee: nil, team: '' })
+        .and_return({})
+
+      expect { described_class.new(options).bug_update(7) }.to output.to_stdout
+    end
+
+    it 'passes a custom priority number through' do
+      options = { slug: 'a', mode: 'production', priority: '7' }
+
+      expect(client).to receive(:invoke_tool)
+        .with('update_bug', { slug: 'a', mode: 'production', number: 7, priority_id: 7 })
+        .and_return({})
+
+      expect { described_class.new(options).bug_update(7) }.to output.to_stdout
+    end
+
+    it 'rejects a priority that is neither a name nor a number' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', priority: 'urgent' }).bug_update(7) }
+        .to output(/Unknown --priority urgent/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects combining --assignee with --unassign' do
+      options = { slug: 'a', mode: 'production', assignee: 'dev@example.com', unassign: true }
+
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new(options).bug_update(7) }
+        .to output(/--assignee cannot be combined with --unassign/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects combining --team with --clear-team' do
+      options = { slug: 'a', mode: 'production', team: 'Core', clear_team: true }
+
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new(options).bug_update(7) }
+        .to output(/--team cannot be combined with --clear-team/).to_stdout.and raise_error(SystemExit)
+    end
+
+    # The server reads a blank assignee or team as "unassign", so an empty shell
+    # variable must not clear the field.
+    it 'rejects a blank --assignee and points to --unassign' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', assignee: '' }).bug_update(7) }
+        .to output(/--assignee needs a teammate's email\. Use --unassign/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects a blank --team and points to --clear-team' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', team: '  ' }).bug_update(7) }
+        .to output(/--team needs a team name or id\. Use --clear-team/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects a blank --comment' do
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new({ slug: 'a', mode: 'production', status: 'closed', comment: '' }).bug_update(7) }
+        .to output(/--comment needs text/).to_stdout.and raise_error(SystemExit)
+    end
   end
 
   describe '#apm_groups' do
@@ -235,6 +309,26 @@ RSpec.describe Luciq::Commands::Query do
       expect(client).not_to receive(:invoke_tool)
       expect { described_class.new(options).bug_update(7) }
         .to output(/cannot be combined/).to_stdout.and raise_error(SystemExit)
+    end
+
+    it 'rejects combining a duplicate action with --unassign' do
+      options = { slug: 'a', mode: 'production', unassign: true, action: 'unmark_as_duplicate' }
+
+      expect(client).not_to receive(:invoke_tool)
+      expect { described_class.new(options).bug_update(7) }
+        .to output(%r{cannot be combined with --status/--priority/--assignee/--unassign}).to_stdout
+        .and raise_error(SystemExit)
+    end
+
+    it 'allows a comment alongside a duplicate action' do
+      options = { slug: 'a', mode: 'production', duplicate_of: 99, comment: 'Same root cause as 99' }
+
+      expect(client).to receive(:invoke_tool).with(
+        'update_bug', hash_including(action: 'mark_as_duplicate', original_bug_number: 99,
+                                     comment: 'Same root cause as 99')
+      ).and_return({})
+
+      expect { described_class.new(options).bug_update(7) }.to output.to_stdout
     end
   end
 

@@ -4,14 +4,16 @@ require 'json'
 require 'luciq/api/client'
 require 'luciq/config'
 require 'luciq/commands/query_arguments'
+require 'luciq/commands/bug_update_arguments'
 
 module Luciq
   module Commands
     # Read/query commands. Each public method maps one-to-one to an MCP tool:
-    # it builds that tool's arguments from typed CLI flags (see QueryArguments)
-    # and proxies to the MCP server's CLI endpoint.
+    # it builds that tool's arguments from typed CLI flags (see QueryArguments
+    # and BugUpdateArguments) and proxies to the MCP server's CLI endpoint.
     class Query
       include QueryArguments
+      include BugUpdateArguments
 
       def initialize(options = {})
         @options = options

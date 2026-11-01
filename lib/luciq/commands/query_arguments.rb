@@ -86,44 +86,6 @@ module Luciq
         f
       end
 
-      # Top-level (non-filter) changes for `bugs update`.
-      def bug_update_changes
-        action = bug_duplicate_action
-        if action && (@options[:status] || @options[:priority])
-          raise 'Duplicate marking cannot be combined with --status/--priority'
-        end
-        if @options[:clear_tags] && @options[:tag_action]
-          raise '--clear-tags cannot be combined with --tag-action (--clear-tags already replaces with an empty set)'
-        end
-
-        changes = {
-          status_id: map_one(BUG_STATUS_IDS, @options[:status]),
-          priority_id: map_one(BUG_PRIORITY_IDS, @options[:priority]),
-          tags: (@options[:clear_tags] ? [] : @options[:tags]),
-          action: action,
-          original_bug_number: @options[:duplicate_of]
-        }.compact
-
-        if changes.empty?
-          raise 'Provide at least one change (--status/--priority/--tags/--clear-tags/--duplicate-of/--action)'
-        end
-
-        # tag_action only modifies how --tags is applied; on its own it is not a change
-        if @options[:clear_tags]
-          changes[:tag_action] = 'replace'
-        elsif @options[:tag_action]
-          changes[:tag_action] = @options[:tag_action]
-        end
-
-        changes
-      end
-
-      def bug_duplicate_action
-        return @options[:action] if @options[:action]
-
-        'mark_as_duplicate' if @options[:duplicate_of]
-      end
-
       def filters_arg(filters)
         filters.empty? ? {} : { filters: filters }
       end
