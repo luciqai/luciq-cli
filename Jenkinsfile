@@ -3,6 +3,7 @@
 ci(
   units: [[
     type: 'library',
+    defaultBranchTests: true,
     test: [
       container: [name: 'ruby', image: podCI.thirdParty('ruby:3.3'), size: 'small'],
       env: ['BUNDLE_PATH=/tmp/bundle', 'HOME=/tmp'],
