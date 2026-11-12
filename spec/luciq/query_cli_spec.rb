@@ -23,6 +23,27 @@ RSpec.describe Luciq::CrashesCLI do
   end
 end
 
+RSpec.describe Luciq::ApmCLI do
+  describe 'funnel-events --event-type' do
+    it 'accepts user_event and passes it on to the query' do
+      query = instance_double(Luciq::Commands::Query)
+      expect(Luciq::Commands::Query).to receive(:new)
+        .with(hash_including('event_type' => 'user_event')).and_return(query)
+      expect(query).to receive(:apm_funnel_events)
+
+      expect { Luciq::CLI.start(%w[apm funnel-events --slug a --mode production --event-type user_event]) }
+        .not_to raise_error
+    end
+
+    it 'still rejects an unknown event type before any request' do
+      expect(Luciq::Commands::Query).not_to receive(:new)
+
+      expect { Luciq::CLI.start(%w[apm funnel-events --slug a --mode production --event-type bogus]) }
+        .to raise_error(SystemExit).and output(/Expected '--event-type' to be one of .*; got bogus/).to_stderr
+    end
+  end
+end
+
 RSpec.describe Luciq::BugsCLI do
   describe 'update' do
     let(:client) { instance_double(Luciq::API::Client) }
