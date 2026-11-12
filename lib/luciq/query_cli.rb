@@ -302,11 +302,14 @@ module Luciq
 
     desc 'funnel-events', 'List pickable events for building funnels'
     long_desc(<<~DESC, wrap: false)
-      List events (network / screen_loading groups) that can be added to a funnel.
+      List events that can be added to a funnel. Without --event-type, only network and
+      screen_loading events are returned; request user events with --event-type user_event.
+      User events have no ulid: use their name in funnel-create steps.
       Narrow with --event-type and/or a name substring via --q.
     DESC
     QueryOptions.app(self)
-    option :event_type, type: :string, enum: %w[network screen_loading], desc: 'Event type (default: all)'
+    option :event_type, type: :string, enum: %w[network screen_loading user_event],
+                        desc: 'Event type (default: network and screen_loading)'
     option :q, type: :string, desc: 'Case-insensitive name substring'
     option :limit, type: :numeric, desc: 'Max events per type (1-25, default 20)'
     def funnel_events

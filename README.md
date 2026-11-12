@@ -218,7 +218,7 @@ tags by default; `--tag-action replace` sets `--tags` as the full list (removing
 | `groups --metric M` | Rank groups worst-first. `--metric`: network, launch, flows, screen_loading, frame_drop, funnels. `--sort` is a JSON object `{"by":…,"direction":…}` |
 | `group --metric M` | Panels for one group; identify with `--group-uuid` or `--group-url`. `--views` is a JSON array (default `["summary"]`); `--method` applies to network |
 | `occurrence --metric M --selector S` | Inspect occurrences (`--selector`: worst/by_token/list). Flags: `--token`, `--current-token`, `--direction`, `--limit` |
-| `funnel-events` | List events pickable for funnels. Flags: `--event-type`, `--q`, `--limit` |
+| `funnel-events` | List events pickable for funnels. Flags: `--event-type` (`network`, `screen_loading`, `user_event`; default network and screen_loading), `--q`, `--limit` |
 | `funnel-create --name N --events JSON` | Create a funnel from 2–20 steps |
 | `funnel-update --ulid U` | Update a funnel (`--name`, `--events`) |
 | `funnel-delete --ulid U` | Delete a funnel |

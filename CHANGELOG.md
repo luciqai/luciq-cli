@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `user_event` value for `luciq apm funnel-events --event-type`, to list user events for funnels. Without `--event-type` only network and screen_loading events are returned.
 - `FORCE_RESTART` value for `luciq crashes list --type`, to list force restarts. The server lists them only when this value is given, and only on plans that include force restarts.
 - `luciq issues list` accepts `APP_HANG` and `FORCE_RESTART` in `crashes_types` to include app hangs and force restarts
 - `--assignee`, `--unassign`, `--team`, `--clear-team`, and `--comment` on `luciq bugs update`, to assign a teammate (by email) or a team (by name or id) and to add a comment to the activity feed
