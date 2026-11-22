@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `cost` value for `luciq issues list --sort-by`, to rank crashes and APM issues by cost. Each of them then carries `went_wrong_sessions`, `criticality`, `cost` and `potential_loss` (in USD) under `details`, and the response returns the app's `value_per_session`. Bugs and AI issues have no cost and sort as a cost of 0.
 - `user_event` value for `luciq apm funnel-events --event-type`, to list user events for funnels. Without `--event-type` only network and screen_loading events are returned.
 - `FORCE_RESTART` value for `luciq crashes list --type`, to list force restarts. The server lists them only when this value is given, and only on plans that include force restarts.
 - `luciq issues list` accepts `APP_HANG` and `FORCE_RESTART` in `crashes_types` to include app hangs and force restarts

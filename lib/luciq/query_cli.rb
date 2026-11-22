@@ -432,8 +432,11 @@ module Luciq
     long_desc(<<~DESC, wrap: false)
       List issues across crashes, APM, AI, and bugs, ranked by Apdex impact.
 
-      Typed flags: --limit, --sort-by (apdex_impact/issue_count),
-      --sort-direction, --top-issues (curated shortlist). --pagination is a JSON
+      Typed flags: --limit, --sort-by (apdex_impact/issue_count/cost),
+      --sort-direction, --top-issues (curated shortlist). --sort-by cost ranks
+      crashes and APM issues by cost and adds went_wrong_sessions, criticality,
+      cost and potential_loss (USD, an upper bound) to their details; bugs and
+      AI issues have no cost and sort as 0. --pagination is a JSON
       object of per-source cursor tokens. Other filters via --filters:
         date_ms          {"gte": <ms>, "lte": <ms>}  (>= 24h span)
         search_tokens    ["<text>", ...]
@@ -448,7 +451,7 @@ module Luciq
     DESC
     QueryOptions.app(self)
     option :limit, type: :numeric, desc: 'Maximum number of issues (1-50)'
-    option :sort_by, type: :string, enum: %w[apdex_impact issue_count], desc: 'Sort field'
+    option :sort_by, type: :string, enum: %w[apdex_impact issue_count cost], desc: 'Sort field'
     option :sort_direction, type: :string, enum: %w[asc desc], desc: 'Sort direction'
     option :top_issues, type: :boolean, desc: 'Return a curated shortlist'
     option :pagination, type: :string, desc: 'Per-source cursor tokens JSON object'
