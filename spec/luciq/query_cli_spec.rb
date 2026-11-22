@@ -44,6 +44,27 @@ RSpec.describe Luciq::ApmCLI do
   end
 end
 
+RSpec.describe Luciq::IssuesCLI do
+  describe 'list --sort-by' do
+    it 'accepts cost and passes it on to the query' do
+      query = instance_double(Luciq::Commands::Query)
+      expect(Luciq::Commands::Query).to receive(:new)
+        .with(hash_including('sort_by' => 'cost')).and_return(query)
+      expect(query).to receive(:issues_list)
+
+      expect { Luciq::CLI.start(%w[issues list --slug a --mode production --sort-by cost]) }
+        .not_to raise_error
+    end
+
+    it 'still rejects an unknown sort field before any request' do
+      expect(Luciq::Commands::Query).not_to receive(:new)
+
+      expect { Luciq::CLI.start(%w[issues list --slug a --mode production --sort-by loss]) }
+        .to raise_error(SystemExit).and output(/Expected '--sort-by' to be one of .*; got loss/).to_stderr
+    end
+  end
+end
+
 RSpec.describe Luciq::BugsCLI do
   describe 'update' do
     let(:client) { instance_double(Luciq::API::Client) }
